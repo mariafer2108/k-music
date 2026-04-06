@@ -102,7 +102,7 @@ struct FullPlayerView: View {
                                         .cornerRadius(20)
                                 }
                                 .onAppear { updateVideoPosition(geo: videoGeo) }
-                                .onChange(of: videoGeo.frame(in: .global)) { _ in updateVideoPosition(geo: videoGeo) }
+                                .onChange(of: videoGeo.frame(in: .global)) { _, _ in updateVideoPosition(geo: videoGeo) }
                             }
                         }
                         .frame(width: screenWidth - 40, height: (screenWidth - 40) * 0.5625)
@@ -221,6 +221,58 @@ struct FullPlayerView: View {
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
+                            
+                            HStack(spacing: 0) {
+                                Button(action: {
+                                    playerManager.selectedTab = 0
+                                    dismissPlayer()
+                                }) {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "house.fill")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Inicio")
+                                            .font(.system(size: 10, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .frame(maxWidth: .infinity)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                
+                                Button(action: {
+                                    playerManager.selectedTab = 1
+                                    dismissPlayer()
+                                }) {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "magnifyingglass")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Buscar")
+                                            .font(.system(size: 10, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .frame(maxWidth: .infinity)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                
+                                Button(action: {
+                                    playerManager.selectedTab = 2
+                                    dismissPlayer()
+                                }) {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "music.note.list")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Biblioteca")
+                                            .font(.system(size: 10, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .frame(maxWidth: .infinity)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.top, 10)
                         }
                         .padding(.bottom, geometry.safeAreaInsets.bottom + 10)
                     }

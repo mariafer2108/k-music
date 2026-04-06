@@ -70,11 +70,10 @@ struct ContentView: View {
                 
                 // Capa 2: Full Player Overlay (Fondo y Controles)
                 if showFullPlayer && isCompact {
-                    let tabBarHeight: CGFloat = 49 + fullScreenGeometry.safeAreaInsets.bottom
-                    let availableHeight = max(0, fullScreenGeometry.size.height - tabBarHeight)
                     FullPlayerView()
-                        .frame(width: fullScreenGeometry.size.width, height: availableHeight)
-                        .position(x: fullScreenGeometry.size.width / 2, y: availableHeight / 2)
+                        .frame(width: fullScreenGeometry.size.width, height: fullScreenGeometry.size.height)
+                        .ignoresSafeArea()
+                        .background(KMTheme.background)
                         .zIndex(50)
                         .transition(.move(edge: .bottom))
                 }
@@ -99,7 +98,8 @@ struct ContentView: View {
             hasSong = song != nil
         }
         #if os(iOS)
-        .onChange(of: showFullPlayer) { newValue in
+        .onChange(of: showFullPlayer) { _, newValue in
+            UITabBar.appearance().isHidden = newValue
             let appearance = UITabBarAppearance()
             if newValue {
                 appearance.configureWithOpaqueBackground()
@@ -120,17 +120,33 @@ struct ContentView: View {
 struct iPhoneLayout: View {
     @ObservedObject private var playerManager = PlayerManager.shared
     var body: some View {
-        TabView(selection: $playerManager.selectedTab) {
-            HomeView().tabItem { Label("Inicio", systemImage: "house.fill") }.tag(0)
-            SearchView().tabItem { Label("Buscar", systemImage: "magnifyingglass") }.tag(1)
-            LibraryView().tabItem { Label("Biblioteca", systemImage: "music.note.list") }.tag(2)
+        Group {
+            if playerManager.showFullPlayer {
+                tabContent(playerManager.selectedTab)
+            } else {
+                TabView(selection: $playerManager.selectedTab) {
+                    HomeView().tabItem { Label("Inicio", systemImage: "house.fill") }.tag(0)
+                    SearchView().tabItem { Label("Buscar", systemImage: "magnifyingglass") }.tag(1)
+                    LibraryView().tabItem { Label("Biblioteca", systemImage: "music.note.list") }.tag(2)
+                }
+            }
         }
         .accentColor(.purple)
-        .onChange(of: playerManager.selectedTab) { _ in
+        .onChange(of: playerManager.selectedTab) { _, _ in
             if playerManager.showFullPlayer {
                 playerManager.showFullPlayer = false
             }
         }
+        #if os(iOS)
+        .onAppear { UITabBar.appearance().isHidden = false }
+        #endif
+    }
+    
+    @ViewBuilder
+    private func tabContent(_ tab: Int) -> some View {
+        if tab == 0 { HomeView() }
+        else if tab == 1 { SearchView() }
+        else { LibraryView() }
     }
 }
 

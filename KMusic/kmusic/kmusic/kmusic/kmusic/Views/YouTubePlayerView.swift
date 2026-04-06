@@ -68,7 +68,13 @@ struct YouTubePlayerView: UIViewRepresentable {
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
         guard let song = playerManager.currentSong else { return }
-        uiView.isUserInteractionEnabled = playerManager.showFullPlayer
+        let desiredInteraction = playerManager.showFullPlayer
+        if context.coordinator.lastInteractionEnabled != desiredInteraction {
+            context.coordinator.lastInteractionEnabled = desiredInteraction
+            DispatchQueue.main.async {
+                uiView.isUserInteractionEnabled = desiredInteraction
+            }
+        }
         let videoID = song.youtubeID
         
         if context.coordinator.lastVideoID != videoID {
@@ -150,6 +156,7 @@ struct YouTubePlayerView: UIViewRepresentable {
         var lastIsPlaying: Bool?
         var lastSeekRequestID: Int = 0
         var lastPlaybackCommandID: Int = 0
+        var lastInteractionEnabled: Bool?
         var lastEvalAt: CFAbsoluteTime = 0
         var lastReportAt: CFAbsoluteTime = 0
         private var reportTimer: Timer?
